@@ -17,25 +17,25 @@ extern SystemState currentState;
 //* ************************************************************************
 
 void retractPositionClampForPushWood() {
-    retractClamp(POSITION_CLAMP_TYPE);
+    retractClampSimple(POSITION_CLAMP_ID);
     Serial.println("PUSHWOOD: Position clamp retracted");
 }
 
 void swapToSecureControlForPushWood() {
     // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    extendClamp(POSITION_CLAMP_TYPE);
+    extendClampSimple(POSITION_CLAMP_ID);
     Serial.println("PUSHWOOD: Position clamp extended for wood control");
     
-    retractClamp(WOOD_SECURE_CLAMP_TYPE);
+    retractClampSimple(WOOD_SECURE_CLAMP_ID);
     Serial.println("PUSHWOOD: Secure wood clamp retracted - position clamp taking control");
 }
 
 void swapToPositionControlForPushWood() {
     // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    retractClamp(POSITION_CLAMP_TYPE);
+    retractClampSimple(POSITION_CLAMP_ID);
     Serial.println("PUSHWOOD: Position clamp retracted");
     
-    extendClamp(WOOD_SECURE_CLAMP_TYPE);
+    extendClampSimple(WOOD_SECURE_CLAMP_ID);
     Serial.println("PUSHWOOD: Secure wood clamp extended - securing wood for final positioning");
 }
 
@@ -110,19 +110,30 @@ void executePushWoodForwardSequence() {
     }
     
     //! ************************************************************************
-    //! STEP 2: MOVE POSITION MOTOR TO HOME (ONE TIME)
+    //! STEP 2: MOVE POSITION MOTOR TO TRAVEL POSITION
     //! ************************************************************************
     if (positionClampRetracted && !positionMotorToHome) {
-        movePositionMotorToHomeForPushWood();
+        extendClampSimple(POSITION_CLAMP_ID);
+        Serial.println("PUSHWOODFORWARD: Position clamp extended");
+        
+        retractClampSimple(WOOD_SECURE_CLAMP_ID);
+        Serial.println("PUSHWOODFORWARD: Wood secure clamp retracted");
+        
+        advancePositionMotorForPushWood();
         positionMotorToHome = true;
     }
     
     //! ************************************************************************
-    //! STEP 3: WAIT FOR HOME, THEN SWAP TO SECURE CONTROL (ONE TIME)
+    //! STEP 3: WAIT FOR POSITION MOTOR TO REACH TRAVEL
     //! ************************************************************************
     if (positionMotorToHome && !clampsSwappedToSecure) {
+        positionMotor.run();
         if (positionMotor.distanceToGo() == 0) {
-            swapToSecureControlForPushWood();
+            retractClampSimple(POSITION_CLAMP_ID);
+            Serial.println("PUSHWOODFORWARD: Position clamp retracted when motor reaches travel");
+            
+            extendClampSimple(WOOD_SECURE_CLAMP_ID);
+            Serial.println("PUSHWOODFORWARD: Wood secure clamp extended");
             clampsSwappedToSecure = true;
         }
     }

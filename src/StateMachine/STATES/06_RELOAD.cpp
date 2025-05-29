@@ -18,18 +18,18 @@ extern bool isReloadMode;
 //* ************************************************************************
 
 void retractAllClampsForReload() {
-    // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    retractClamp(POSITION_CLAMP_TYPE);
-    retractClamp(WOOD_SECURE_CLAMP_TYPE);
-    retractClamp(CATCHER_CLAMP_TYPE);
-    Serial.println("RELOAD: All clamps retracted - safe for manual access");
+    // Use existing cylinder functions
+    retractClampSimple(POSITION_CLAMP_ID);
+    retractClampSimple(WOOD_SECURE_CLAMP_ID);
+    retractClampSimple(CATCHER_CLAMP_ID);
+    Serial.println("RELOAD: All clamps retracted");
 }
 
-void reengageOperationalClampsForReload() {
-    // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    extendClamp(POSITION_CLAMP_TYPE);
-    extendClamp(WOOD_SECURE_CLAMP_TYPE);
-    Serial.println("RELOAD: Operational clamps re-engaged - ready for normal operation");
+void setOperationalClampsForReload() {
+    // Use existing cylinder functions 
+    extendClampSimple(POSITION_CLAMP_ID);
+    extendClampSimple(WOOD_SECURE_CLAMP_ID);
+    Serial.println("RELOAD: Operational clamps set (position and wood secure extended)");
 }
 
 //* ************************************************************************
@@ -108,7 +108,7 @@ void executeReloadSequence() {
     //! ************************************************************************
     if (exitConditionMet && !clampsReengaged) {
         exitReloadMode();
-        reengageOperationalClampsForReload();
+        setOperationalClampsForReload();
         clampsReengaged = true;
     }
     

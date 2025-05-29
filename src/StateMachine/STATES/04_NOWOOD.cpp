@@ -19,16 +19,16 @@ extern SystemState currentState;
 //* ************************************************************************
 
 void retractSecureClampForNowood() {
-    retractClamp(WOOD_SECURE_CLAMP_TYPE);
+    retractClampSimple(WOOD_SECURE_CLAMP_ID);
     Serial.println("NOWOOD: Secure wood clamp retracted");
 }
 
 void resetClampPositionsForNowood() {
     // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    retractClamp(POSITION_CLAMP_TYPE);
+    retractClampSimple(POSITION_CLAMP_ID);
     Serial.println("NOWOOD: Position clamp retracted");
     
-    extendClamp(POSITION_CLAMP_TYPE);
+    extendClampSimple(POSITION_CLAMP_ID);
     Serial.println("NOWOOD: Position clamp extended - reset to operational position");
 }
 

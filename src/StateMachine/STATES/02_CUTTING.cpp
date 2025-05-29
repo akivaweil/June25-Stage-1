@@ -21,11 +21,11 @@ extern SystemState currentState;
 //* ************************ CLAMP OPERATIONS FOR CUTTING ****************
 //* ************************************************************************
 
-void extendBothClampsForCutting() {
-    // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    extendClamp(POSITION_CLAMP_TYPE);
-    extendClamp(WOOD_SECURE_CLAMP_TYPE);
-    Serial.println("CUTTING: Both clamps extended - wood secured for cutting");
+void activateClampingForCutting() {
+    // Use existing clamp functions from CLAMPS_FUNCTIONS.cpp
+    extendClampSimple(POSITION_CLAMP_ID);
+    extendClampSimple(WOOD_SECURE_CLAMP_ID);
+    Serial.println("CUTTING: Position and wood secure clamps activated");
 }
 
 //* ************************************************************************
@@ -63,7 +63,7 @@ bool checkCatcherClampActivationPoint() {
     
     if (cutMotor.currentPosition() >= activationPosition) {
         // Use existing cylinder function from 99_CYLINDER_FUNCTIONS.cpp
-        extendClamp(CATCHER_CLAMP_TYPE);
+        extendClampSimple(CATCHER_CLAMP_ID);
         Serial.println("CUTTING: Catcher clamp activated at early activation offset");
         return true;
     }
@@ -115,7 +115,7 @@ void executeCuttingSequence() {
     //! STEP 1: EXTEND BOTH CLAMPS (ONE TIME)
     //! ************************************************************************
     if (!clampsExtended) {
-        extendBothClampsForCutting();
+        activateClampingForCutting();
         clampsExtended = true;
     }
     
