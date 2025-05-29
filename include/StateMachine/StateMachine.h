@@ -17,11 +17,11 @@
 extern AccelStepper cutMotor;
 extern AccelStepper positionMotor;
 
-// Clamp Types Enum (using _TYPE suffix)
+// Clamp Types Enum
 enum ClampType {
-    POSITION_CLAMP_TYPE,
-    WOOD_SECURE_CLAMP_TYPE,
-    CATCHER_CLAMP_TYPE
+    POSITION_CLAMP_ENUM,
+    WOOD_SECURE_CLAMP_ENUM,
+    CATCHER_CLAMP_ENUM
 };
 
 // Motor Types Enum
@@ -112,8 +112,15 @@ void movePositionMotorToInitialAfterHoming();
 // Clamp Control Functions
 void extendClamp(ClampType clamp);
 void retractClamp(ClampType clamp);
+void extendClampSimple(int clampId);
+void retractClampSimple(int clampId);
 void retractAllCylinders();
 void extendAllCylinders();
+
+// Simple clamp identifiers for state files
+#define POSITION_CLAMP_ID 0
+#define WOOD_SECURE_CLAMP_ID 1
+#define CATCHER_CLAMP_ID 2
 
 // Sensor Reading Functions
 bool readSensor(SensorType sensor);

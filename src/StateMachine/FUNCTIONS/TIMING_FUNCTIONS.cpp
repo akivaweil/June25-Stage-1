@@ -43,7 +43,7 @@ void checkCatcherClampEarlyActivation() {
     float earlyActivationPositionInches = targetCutPositionInches - CATCHER_CLAMP_EARLY_ACTIVATION_OFFSET_INCHES;
     
     if (currentCutPositionInches >= earlyActivationPositionInches && !catcherClampIsEngaged) {
-        extendClamp(CATCHER_CLAMP_TYPE);
+        extendClampSimple(CATCHER_CLAMP_ID);
         catcherClampEngageTime = millis();
         catcherClampIsEngaged = true;
         Serial.print("Catcher clamp early activation at cut position ");
@@ -60,7 +60,7 @@ void checkCatcherClampEarlyActivation() {
 
 void handleCatcherClampDisengage() {
     if (catcherClampIsEngaged && (millis() - catcherClampEngageTime >= CATCHER_CLAMP_ENGAGE_DURATION_MS)) {
-        retractClamp(CATCHER_CLAMP_TYPE);
+        retractClampSimple(CATCHER_CLAMP_ID);
         catcherClampIsEngaged = false;
         Serial.println("Catcher clamp disengaged after duration timeout");
     }
