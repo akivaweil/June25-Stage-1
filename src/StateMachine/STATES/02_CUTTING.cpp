@@ -26,7 +26,7 @@ extern SystemState currentState;
 //!    - Both clamps activated simultaneously
 //!
 //! STEP 2: START CUT MOTOR MOVEMENT (ONE TIME)
-//!    - Set cut motor speed to CUT_MOTOR_NORMAL_SPEED
+//!    - Set cut motor speed to CUT_MOTOR_CUTTING_SPEED
 //!    - Move cut motor to CUT_MOTOR_CUT_POSITION
 //!    - Begin cutting sequence
 //!
@@ -61,7 +61,7 @@ void activateClampingForCutting() {
 //* ************************************************************************
 
 void startCutMotorMovementForCutting() {
-    moveMotorTo(CUT_MOTOR, CUT_MOTOR_CUT_POSITION, CUT_MOTOR_NORMAL_SPEED);
+    moveMotorTo(CUT_MOTOR, CUT_MOTOR_CUT_POSITION, CUT_MOTOR_CUTTING_SPEED);
     Serial.print("CUTTING: Cut motor started - moving to position ");
     Serial.println(CUT_MOTOR_CUT_POSITION);
 }
@@ -114,7 +114,14 @@ bool checkCatcherServoActivationPoint() {
 //* ************************************************************************
 
 bool checkWoodSensorForStateTransition() {
-    if (readSensor(WOOD_SENSOR_TYPE)) {
+    bool sensorReading = readSensor(WOOD_SENSOR_TYPE);
+    Serial.print("CUTTING: Wood sensor reading: ");
+    Serial.print(sensorReading ? "DETECTED (LOW)" : "NOT DETECTED (HIGH)");
+    Serial.print(" - Raw pin reading: ");
+    woodSensor.update();
+    Serial.println(woodSensor.read());
+    
+    if (sensorReading) {
         Serial.println("CUTTING: Wood detected - transitioning to YESWOOD");
         currentState = YESWOOD;
         return true;

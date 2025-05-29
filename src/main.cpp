@@ -122,12 +122,12 @@ void setup() {
   //! Initialize motors
   Serial.println("Engine initialized");
 
-  cutMotor.setSpeed(CUT_MOTOR_NORMAL_SPEED);
+  cutMotor.setMaxSpeed(30000);  // Set maximum speed for cut motor (higher than any speed used)
   cutMotor.setAcceleration(CUT_MOTOR_NORMAL_ACCELERATION);
   cutMotor.setCurrentPosition(0);
   Serial.println("Cut motor initialized successfully");
 
-  positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
+  positionMotor.setMaxSpeed(50000);  // Set maximum speed for position motor (higher than any speed used)
   positionMotor.setAcceleration(POSITION_MOTOR_NORMAL_ACCELERATION);
   positionMotor.setCurrentPosition(0);
   Serial.println("Position motor initialized successfully");

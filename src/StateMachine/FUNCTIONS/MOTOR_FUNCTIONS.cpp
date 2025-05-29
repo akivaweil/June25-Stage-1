@@ -23,7 +23,8 @@ extern AccelStepper positionMotor;
 void moveMotorTo(MotorType motor, float position, float speed) {
     switch(motor) {
         case CUT_MOTOR:
-            cutMotor.setSpeed(speed);
+            cutMotor.setMaxSpeed(speed);
+            cutMotor.setAcceleration(CUT_MOTOR_NORMAL_ACCELERATION);
             cutMotor.moveTo(position);
             Serial.print("Cut motor moving to position: ");
             Serial.print(position);
@@ -31,7 +32,8 @@ void moveMotorTo(MotorType motor, float position, float speed) {
             Serial.println(speed);
             break;
         case POSITION_MOTOR:
-            positionMotor.setSpeed(speed);
+            positionMotor.setMaxSpeed(speed);
+            positionMotor.setAcceleration(POSITION_MOTOR_NORMAL_ACCELERATION);
             positionMotor.moveTo(position);
             Serial.print("Position motor moving to position: ");
             Serial.print(position);
@@ -62,7 +64,8 @@ void stopPositionMotor() {
 //! Functions with unique logic that cannot be replaced by moveMotorTo()
 
 void movePositionMotorToTravelWithEarlyActivation() {
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
+    positionMotor.setMaxSpeed(POSITION_MOTOR_NORMAL_SPEED);
+    positionMotor.setAcceleration(POSITION_MOTOR_NORMAL_ACCELERATION);
     positionMotor.moveTo(POSITION_MOTOR_TRAVEL_POSITION);
     Serial.println("Position motor moving to travel position");
     while(positionMotor.distanceToGo() != 0){
@@ -72,11 +75,19 @@ void movePositionMotorToTravelWithEarlyActivation() {
 }
 
 void movePositionMotorToInitialAfterHoming() {
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
+    positionMotor.setMaxSpeed(POSITION_MOTOR_NORMAL_SPEED);
+    positionMotor.setAcceleration(POSITION_MOTOR_NORMAL_ACCELERATION);
     positionMotor.moveTo(0);
     Serial.println("Position motor moving to initial position after homing");
     while(positionMotor.distanceToGo() != 0){
         positionMotor.run();
         // Wait for movement completion - no early activation during position moves
     }
+}
+
+void moveCutMotorToHome() {
+    cutMotor.setMaxSpeed(CUT_MOTOR_RETURN_SPEED);
+    cutMotor.setAcceleration(CUT_MOTOR_RETURN_ACCELERATION);
+    cutMotor.moveTo(0);
+    Serial.println("Cut motor returning to home with return acceleration");
 }

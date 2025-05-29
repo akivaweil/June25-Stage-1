@@ -49,11 +49,12 @@ extern const float STEPS_PER_INCH_POSITION;  // = POSITION_MOTOR_STEPS_PER_INCH
 //* ************************ CUT MOTOR SPEED SETTINGS ********************
 //* ************************************************************************
 // Normal Cutting Operation (Cutting State)
-extern const float CUT_MOTOR_NORMAL_SPEED;      // Speed for the cutting pass (steps/sec)
+extern const float CUT_MOTOR_CUTTING_SPEED;      // Speed for the cutting pass (steps/sec)
 extern const float CUT_MOTOR_NORMAL_ACCELERATION; // Acceleration for the cutting pass (steps/sec^2)
 
 // Return Stroke (Returning State / End of Cutting State)
 extern const float CUT_MOTOR_RETURN_SPEED;     // Speed for returning after a cut (steps/sec)
+extern const float CUT_MOTOR_RETURN_ACCELERATION; // Acceleration for return moves (steps/sec^2)
 
 // Homing Operation (Homing State)
 extern const float CUT_MOTOR_HOMING_SPEED;      // Speed for homing the cut motor (steps/sec)

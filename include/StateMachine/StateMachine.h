@@ -108,6 +108,7 @@ void stopCutMotor();
 void stopPositionMotor();
 void movePositionMotorToTravelWithEarlyActivation();
 void movePositionMotorToInitialAfterHoming();
+void moveCutMotorToHome();
 
 // Clamp Control Functions
 void extendClamp(ClampType clamp);

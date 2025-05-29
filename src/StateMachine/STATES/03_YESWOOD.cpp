@@ -71,7 +71,7 @@ extern SystemState currentState;
 //* ************************************************************************
 
 void returnCutMotorToHomeForYeswood() {
-    moveMotorTo(CUT_MOTOR, 0, CUT_MOTOR_RETURN_SPEED);
+    moveCutMotorToHome();
     Serial.println("YESWOOD: Cut motor returning to home position");
 }
 
@@ -252,6 +252,7 @@ void executeYeswoodSequence() {
         
         // Reset state variables for next cycle
         cutMotorReturnStarted = false;
+        secureClampRetracted = false;
         positionMotorAdvanced = false;
         clampsSwapped = false;
         cutMotorHomeVerified = false;
