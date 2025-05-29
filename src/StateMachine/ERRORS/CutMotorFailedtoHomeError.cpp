@@ -47,8 +47,7 @@ void checkCutMotorHomingTimeout() {
 void checkCutMotorHomingFailure() {
     if (currentState == HOMING && cutMotor.distanceToGo() == 0) {
         // Motor stopped but home switch not triggered
-        cutHomingSwitch.update();
-        if (cutHomingSwitch.read() != HIGH) {
+        if (!readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE)) {
             cutMotorFailedtoHomeError = true;
             cutMotorHomeErrorDetected = true;
             cutMotorHomeErrorTime = millis();
@@ -184,8 +183,7 @@ void printCutMotorHomeErrorStatus() {
     Serial.print(" of ");
     Serial.println(MAX_HOMING_ATTEMPTS);
     Serial.print("Home Switch State: ");
-    cutHomingSwitch.update();
-    Serial.println(cutHomingSwitch.read() == HIGH ? "ACTIVE" : "INACTIVE");
+    Serial.println(readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE) ? "ACTIVE" : "INACTIVE");
     Serial.print("Cut Motor Running: ");
     Serial.println(cutMotor.distanceToGo() != 0 ? "YES" : "NO");
     Serial.println("=====================================");

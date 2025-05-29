@@ -61,8 +61,7 @@ void activateClampingForCutting() {
 //* ************************************************************************
 
 void startCutMotorMovementForCutting() {
-    cutMotor.setSpeed(CUT_MOTOR_NORMAL_SPEED);
-    cutMotor.moveTo(CUT_MOTOR_CUT_POSITION);
+    moveMotorTo(CUT_MOTOR, CUT_MOTOR_CUT_POSITION, CUT_MOTOR_NORMAL_SPEED);
     Serial.print("CUTTING: Cut motor started - moving to position ");
     Serial.println(CUT_MOTOR_CUT_POSITION);
 }
@@ -73,8 +72,7 @@ bool checkCutMotorSafetyAt03Inches() {
     
     // Check if motor has reached 0.3 inches
     if (cutMotor.currentPosition() >= safetyCheckPosition) {
-        wasWoodSuctionedSensor.update();
-        if (wasWoodSuctionedSensor.read() == LOW) {
+        if (readSensor(WOOD_SUCTION_SENSOR_TYPE)) {
             Serial.println("CUTTING: SAFETY VIOLATION - Wood suctioned sensor activated at 0.3 inches");
             cutMotor.stop();
             // TODO: Enter waswoodsuctioned error state
@@ -116,8 +114,7 @@ bool checkCatcherServoActivationPoint() {
 //* ************************************************************************
 
 bool checkWoodSensorForStateTransition() {
-    woodSensor.update();
-    if (woodSensor.read() == LOW) {
+    if (readSensor(WOOD_SENSOR_TYPE)) {
         Serial.println("CUTTING: Wood detected - transitioning to YESWOOD");
         currentState = YESWOOD;
         return true;

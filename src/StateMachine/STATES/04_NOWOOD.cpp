@@ -78,20 +78,17 @@ void resetClampPositionsForNowood() {
 
 void movePositionMotorToNegOneForNowood() {
     // Move to -1 position (negative 1 step)
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
-    positionMotor.moveTo(-1);
+    moveMotorTo(POSITION_MOTOR, -1, POSITION_MOTOR_NORMAL_SPEED);
     Serial.println("NOWOOD: Position motor moving to -1 position");
 }
 
 void returnCutMotorToHomeForNowood() {
-    cutMotor.setSpeed(CUT_MOTOR_RETURN_SPEED);
-    cutMotor.moveTo(0);
+    moveMotorTo(CUT_MOTOR, 0, CUT_MOTOR_RETURN_SPEED);
     Serial.println("NOWOOD: Cut motor returning to home position");
 }
 
 void advancePositionMotorToTravelForNowood() {
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
-    positionMotor.moveTo(POSITION_MOTOR_TRAVEL_POSITION);
+    moveMotorTo(POSITION_MOTOR, POSITION_MOTOR_TRAVEL_POSITION, POSITION_MOTOR_NORMAL_SPEED);
     Serial.println("NOWOOD: Position motor moving to travel position");
 }
 

@@ -55,11 +55,9 @@ extern bool isHomed;
 void homeCutMotorBlocking(Bounce& homingSwitch, unsigned long timeout) {
     Serial.println("Homing cut motor...");
     unsigned long startTime = millis();
-    cutMotor.setSpeed(CUT_MOTOR_HOMING_SPEED);
-    cutMotor.moveTo(CUT_HOMING_DIRECTION * CUT_MOTOR_HOMING_DISTANCE);
+    moveMotorTo(CUT_MOTOR, CUT_HOMING_DIRECTION * CUT_MOTOR_HOMING_DISTANCE, CUT_MOTOR_HOMING_SPEED);
 
-    while (homingSwitch.read() != HIGH) {
-        homingSwitch.update();
+    while (!readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE)) {
         cutMotor.run();
         //! Handle OTA updates
         handleOTA();
@@ -78,11 +76,9 @@ void homeCutMotorBlocking(Bounce& homingSwitch, unsigned long timeout) {
 void homePositionMotorBlocking(Bounce& homingSwitch, unsigned long timeout) {
     Serial.println("Homing position motor...");
     unsigned long startTime = millis();
-    positionMotor.setSpeed(POSITION_MOTOR_HOMING_SPEED);
-    positionMotor.moveTo(POSITION_HOMING_DIRECTION * POSITION_MOTOR_HOMING_DISTANCE);
+    moveMotorTo(POSITION_MOTOR, POSITION_HOMING_DIRECTION * POSITION_MOTOR_HOMING_DISTANCE, POSITION_MOTOR_HOMING_SPEED);
 
-    while (homingSwitch.read() != HIGH) {
-        homingSwitch.update();
+    while (!readLimitSwitch(POSITION_MOTOR_HOMING_SWITCH_TYPE)) {
         positionMotor.run();
         //! Handle OTA updates
         handleOTA();
@@ -100,8 +96,7 @@ void homePositionMotorBlocking(Bounce& homingSwitch, unsigned long timeout) {
     Serial.println(" inches");
     
     // Move to travel position after homing
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
-    positionMotor.moveTo(POSITION_MOTOR_TRAVEL_POSITION);
+    moveMotorTo(POSITION_MOTOR, POSITION_MOTOR_TRAVEL_POSITION, POSITION_MOTOR_NORMAL_SPEED);
     Serial.println("Moving to travel position...");
     while(positionMotor.distanceToGo() != 0) {
         positionMotor.run();
@@ -140,13 +135,12 @@ void executeCompleteHomingSequence() {
 bool checkAndRecalibrateCutMotorHome(int attempts) {
     bool sensorDetectedHome = false;
     for (int i = 0; i < attempts; i++) {
-        cutHomingSwitch.update();
         Serial.print("Cut position switch read attempt "); 
         Serial.print(i + 1); 
         Serial.print(": "); 
-        Serial.println(cutHomingSwitch.read());
+        Serial.println(readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE));
         
-        if (cutHomingSwitch.read() == HIGH) {
+        if (readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE)) {
             sensorDetectedHome = true;
             cutMotor.setCurrentPosition(0);
             Serial.println("Cut motor position recalibrated to 0");

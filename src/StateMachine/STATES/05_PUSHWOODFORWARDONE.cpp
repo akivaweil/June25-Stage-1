@@ -98,23 +98,20 @@ void swapToPositionControlForPushWood() {
 //* ************************************************************************
 
 void movePositionMotorToHomeForPushWood() {
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
-    positionMotor.moveTo(0);
+    moveMotorTo(POSITION_MOTOR, 0, POSITION_MOTOR_NORMAL_SPEED);
     Serial.println("PUSHWOOD: Position motor moving to home position (0)");
 }
 
 void advancePositionMotorForPushWood() {
     // Move to POSITION_TRAVEL_DISTANCE - 0.1 inches
     float targetPosition = (POSITION_TRAVEL_DISTANCE - 0.1) * POSITION_MOTOR_STEPS_PER_INCH;
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
-    positionMotor.moveTo(targetPosition);
+    moveMotorTo(POSITION_MOTOR, targetPosition, POSITION_MOTOR_NORMAL_SPEED);
     Serial.print("PUSHWOOD: Position motor moving to advance position: ");
     Serial.println(targetPosition);
 }
 
 void movePositionMotorToFinalForPushWood() {
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
-    positionMotor.moveTo(POSITION_MOTOR_TRAVEL_POSITION);
+    moveMotorTo(POSITION_MOTOR, POSITION_MOTOR_TRAVEL_POSITION, POSITION_MOTOR_NORMAL_SPEED);
     Serial.println("PUSHWOOD: Position motor moving to final travel position");
 }
 

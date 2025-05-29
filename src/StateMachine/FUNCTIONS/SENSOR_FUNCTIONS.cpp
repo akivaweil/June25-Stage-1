@@ -6,6 +6,12 @@
 //! Sensor and switch reading functions
 //! Functions for reading all sensors and limit switches
 
+// External Bounce objects declared in main.cpp
+extern Bounce woodSensor;
+extern Bounce wasWoodSuctionedSensor;
+extern Bounce cutHomingSwitch;
+extern Bounce positionHomingSwitch;
+
 //* ************************************************************************
 //* ************************ UNIFIED SENSOR READING FUNCTIONS ************
 //* ************************************************************************
@@ -14,10 +20,12 @@ bool readSensor(SensorType sensor) {
     switch(sensor) {
         case WOOD_SENSOR_TYPE:
             // Wood sensor is active LOW with input pullup
-            return digitalRead((int)WOOD_SENSOR) == LOW;
+            woodSensor.update();
+            return woodSensor.read() == LOW;
         case WOOD_SUCTION_SENSOR_TYPE:
             // Wood suction sensor is active LOW with input pullup
-            return digitalRead((int)WAS_WOOD_SUCTIONED_SENSOR) == LOW;
+            wasWoodSuctionedSensor.update();
+            return wasWoodSuctionedSensor.read() == LOW;
         default:
             Serial.println("ERROR: Unknown sensor type for readSensor operation");
             return false;
@@ -28,10 +36,12 @@ bool readLimitSwitch(SwitchType switchType) {
     switch(switchType) {
         case CUT_MOTOR_HOMING_SWITCH_TYPE:
             // Cut motor homing switch is active HIGH with input pulldown
-            return digitalRead((int)CUT_MOTOR_HOMING_SWITCH) == HIGH;
+            cutHomingSwitch.update();
+            return cutHomingSwitch.read() == HIGH;
         case POSITION_MOTOR_HOMING_SWITCH_TYPE:
             // Position motor homing switch is active HIGH with input pulldown
-            return digitalRead((int)POSITION_MOTOR_HOMING_SWITCH) == HIGH;
+            positionHomingSwitch.update();
+            return positionHomingSwitch.read() == HIGH;
         default:
             Serial.println("ERROR: Unknown switch type for readLimitSwitch operation");
             return false;

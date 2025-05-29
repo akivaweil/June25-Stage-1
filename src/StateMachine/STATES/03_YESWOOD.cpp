@@ -71,8 +71,7 @@ extern SystemState currentState;
 //* ************************************************************************
 
 void returnCutMotorToHomeForYeswood() {
-    cutMotor.setSpeed(CUT_MOTOR_RETURN_SPEED);
-    cutMotor.moveTo(0);
+    moveMotorTo(CUT_MOTOR, 0, CUT_MOTOR_RETURN_SPEED);
     Serial.println("YESWOOD: Cut motor returning to home position");
 }
 
@@ -84,8 +83,7 @@ void retractSecureClampForYeswood() {
 void advancePositionMotorForYeswood() {
     // Move to POSITION_TRAVEL_DISTANCE - 0.1 inches
     float targetPosition = (POSITION_TRAVEL_DISTANCE - 0.1) * POSITION_MOTOR_STEPS_PER_INCH;
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
-    positionMotor.moveTo(targetPosition);
+    moveMotorTo(POSITION_MOTOR, targetPosition, POSITION_MOTOR_NORMAL_SPEED);
     Serial.print("YESWOOD: Position motor moving to advance position: ");
     Serial.println(targetPosition);
 }
@@ -106,8 +104,7 @@ void swapClampPositionsForYeswood() {
 }
 
 void returnPositionMotorToHomeForYeswood() {
-    positionMotor.setSpeed(POSITION_MOTOR_RETURN_SPEED);
-    positionMotor.moveTo(0);
+    moveMotorTo(POSITION_MOTOR, 0, POSITION_MOTOR_RETURN_SPEED);
     Serial.println("YESWOOD: Position motor returning to home position");
 }
 
@@ -127,8 +124,7 @@ bool checkCutMotorHomeAndSensorForYeswood() {
     if (cutMotor.distanceToGo() == 0 && cutMotor.currentPosition() == 0) {
         // Wait 10ms then check homing sensor
         delay(10);
-        cutHomingSwitch.update();
-        if (cutHomingSwitch.read() == HIGH) {
+        if (readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE)) {
             Serial.println("YESWOOD: Cut motor confirmed at home position");
             return true;
         } else {
@@ -140,8 +136,7 @@ bool checkCutMotorHomeAndSensorForYeswood() {
 }
 
 void advancePositionMotorToTravelForYeswood() {
-    positionMotor.setSpeed(POSITION_MOTOR_NORMAL_SPEED);
-    positionMotor.moveTo(POSITION_MOTOR_TRAVEL_POSITION);
+    moveMotorTo(POSITION_MOTOR, POSITION_MOTOR_TRAVEL_POSITION, POSITION_MOTOR_NORMAL_SPEED);
     Serial.println("YESWOOD: Position motor advancing to travel position for next cycle");
 }
 
