@@ -12,6 +12,60 @@ extern SystemState currentState;
 //! PUSHWOODFORWARDONE-specific functions for manual wood advancement
 //! These functions handle the precise sequence for manually pushing wood forward
 
+//! ************************************************************************
+//! PUSHWOODFORWARDONE STATE SEQUENCE:
+//! ************************************************************************
+//! STEP 1: RETRACT POSITION CLAMP (ONE TIME)
+//!    - Retract position clamp to release wood
+//!    - Prepare for manual wood advancement
+//!
+//! STEP 2: MOVE POSITION MOTOR TO TRAVEL POSITION (ONE TIME)
+//!    - Extend position clamp for wood control
+//!    - Retract wood secure clamp
+//!    - Move position motor to advance position
+//!    - Prepare for wood pushing sequence
+//!
+//! STEP 3: WAIT FOR POSITION MOTOR TO REACH TRAVEL
+//!    - Run position motor until it reaches target
+//!    - When complete: retract position clamp
+//!    - Extend wood secure clamp for wood control
+//!    - Transfer control to secure clamp
+//!
+//! STEP 4: WAIT 300MS (ONE TIME)
+//!    - Allow mechanical settling time
+//!    - Ensure proper clamp engagement
+//!    - Stabilize wood position
+//!
+//! STEP 5: MOVE POSITION MOTOR TO ADVANCE POSITION (ONE TIME)
+//!    - Move motor to POSITION_TRAVEL_DISTANCE - 0.1 inches
+//!    - Advance wood to optimal position
+//!    - Prepare for final positioning
+//!
+//! STEP 6: WAIT FOR ADVANCE, THEN SWAP TO POSITION CONTROL (ONE TIME)
+//!    - Wait for motor to reach advance position
+//!    - Retract position clamp
+//!    - Extend wood secure clamp
+//!    - Transfer control back to position clamp
+//!
+//! STEP 7: WAIT 50MS (ONE TIME)
+//!    - Brief settling delay
+//!    - Ensure clamp engagement
+//!
+//! STEP 8: MOVE TO FINAL TRAVEL POSITION (ONE TIME)
+//!    - Move position motor to final travel position
+//!    - Complete wood advancement sequence
+//!
+//! STEP 8.5: RUN MOTOR (CONTINUOUS)
+//!    - Execute motor movement continuously
+//!    - Maintain motion toward target
+//!
+//! STEP 9: WAIT FOR COMPLETION AND TRANSITION TO IDLE
+//!    - Monitor position motor for completion
+//!    - When motor reaches final position: transition to IDLE
+//!    - Reset all state variables for next cycle
+//!    - Wood advancement complete
+//! ************************************************************************
+
 //* ************************************************************************
 //* ************************ CLAMP OPERATIONS FOR PUSHWOODFORWARDONE *****
 //* ************************************************************************

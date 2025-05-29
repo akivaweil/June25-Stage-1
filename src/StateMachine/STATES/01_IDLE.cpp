@@ -15,6 +15,29 @@ extern SystemState currentState;
 //! These functions are specifically designed for the IDLE state operations
 //! and provide clear, readable implementations for each IDLE task
 
+//! ************************************************************************
+//! IDLE STATE SEQUENCE:
+//! ************************************************************************
+//! STEP 1: HANDLE OTA UPDATES
+//!    - Process any pending OTA (Over-The-Air) updates
+//!    - Maintain network connectivity for remote updates
+//!
+//! STEP 2: MONITOR START CYCLE SWITCH
+//!    - Update start cycle switch debounce state
+//!    - Check if switch reads HIGH (active)
+//!    - If activated: transition to CUTTING state
+//!
+//! STEP 3: MONITOR RELOAD SWITCH
+//!    - Update reload switch debounce state
+//!    - Check if switch reads HIGH (active)
+//!    - If activated: transition to RELOAD state
+//!
+//! STEP 4: MAINTAIN IDLE STATE
+//!    - Continue monitoring if no switches activated
+//!    - System remains ready for next operation
+//!    - Lowest power consumption state
+//! ************************************************************************
+
 //* ************************************************************************
 //* ************************ OTA AND SYSTEM MONITORING *******************
 //* ************************************************************************

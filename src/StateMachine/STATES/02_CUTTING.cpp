@@ -17,6 +17,34 @@ extern SystemState currentState;
 //! These functions handle all aspects of the cutting sequence with clear,
 //! readable implementations specific to the CUTTING state
 
+//! ************************************************************************
+//! CUTTING STATE SEQUENCE:
+//! ************************************************************************
+//! STEP 1: EXTEND BOTH CLAMPS (ONE TIME)
+//!    - Extend position clamp to secure wood position
+//!    - Extend wood secure clamp to hold wood firmly
+//!    - Both clamps activated simultaneously
+//!
+//! STEP 2: START CUT MOTOR MOVEMENT (ONE TIME)
+//!    - Set cut motor speed to CUT_MOTOR_NORMAL_SPEED
+//!    - Move cut motor to CUT_MOTOR_CUT_POSITION
+//!    - Begin cutting sequence
+//!
+//! STEP 3: CONTINUOUS SAFETY AND ACTIVATION CHECKS
+//!    - Run cut motor continuously toward target
+//!    - Safety check at 0.3 inches: monitor wasWoodSuctionedSensor
+//!    - If safety violation: stop motor and enter error state
+//!    - Catcher clamp activation at early offset position
+//!    - Catcher servo activation at early offset position
+//!
+//! STEP 4: CHECK CUT COMPLETION AND ROUTE TO NEXT STATE
+//!    - Monitor cut motor distance to go
+//!    - When cut complete: check wood sensor state
+//!    - If wood detected (LOW): transition to YESWOOD state
+//!    - If no wood detected (HIGH): transition to NOWOOD state
+//!    - Reset all state variables for next cycle
+//! ************************************************************************
+
 //* ************************************************************************
 //* ************************ CLAMP OPERATIONS FOR CUTTING ****************
 //* ************************************************************************

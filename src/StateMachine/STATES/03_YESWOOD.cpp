@@ -17,6 +17,55 @@ extern SystemState currentState;
 //! These functions manage the complex sequence of returning motors,
 //! advancing wood position, and preparing for the next cycle
 
+//! ************************************************************************
+//! YESWOOD STATE SEQUENCE:
+//! ************************************************************************
+//! STEP 1: START CUT MOTOR RETURN (ONE TIME)
+//!    - Set cut motor return speed
+//!    - Move cut motor to home position (0)
+//!    - Begin simultaneous return sequence
+//!
+//! STEP 2: RETRACT SECURE CLAMP (ONE TIME)
+//!    - Retract wood secure clamp to release wood
+//!    - Allow wood movement for advancement
+//!
+//! STEP 3: ADVANCE POSITION MOTOR (ONE TIME)
+//!    - Move position motor to POSITION_TRAVEL_DISTANCE - 0.1 inches
+//!    - Advance wood to optimal positioning
+//!
+//! STEP 4: SWAP CLAMP POSITIONS (WHEN POSITION MOTOR ADVANCE COMPLETE)
+//!    - Extend wood secure clamp to hold wood
+//!    - Retract position clamp for motor return
+//!    - Transfer wood control between clamps
+//!
+//! STEP 5: START POSITION MOTOR RETURN (WHEN CLAMPS SWAPPED)
+//!    - Move position motor back to home position (0)
+//!    - Prepare for next positioning cycle
+//!
+//! STEP 6: EXTEND POSITION CLAMP (WHEN POSITION MOTOR AT HOME)
+//!    - Extend position clamp when motor reaches home
+//!    - Secure position for wood advancement
+//!
+//! STEP 6.5: VERIFY CUT MOTOR HOME (CONTINUOUS CHECK)
+//!    - Verify cut motor at home position
+//!    - Check cut homing switch for confirmation
+//!    - Ensure motor position accuracy
+//!
+//! STEP 7: START FINAL ADVANCE (WHEN POSITION CLAMP EXTENDED AND CUT MOTOR VERIFIED)
+//!    - Move position motor to final travel position
+//!    - Complete wood positioning sequence
+//!
+//! STEP 8: RUN MOTORS (CONTINUOUS)
+//!    - Execute motor movements continuously
+//!    - Maintain motion toward targets
+//!
+//! STEP 9: CHECK CYCLE CONTINUATION (WHEN SEQUENCE COMPLETE)
+//!    - Monitor start cycle switch state
+//!    - If HIGH: transition to CUTTING for next cycle
+//!    - If LOW: transition to IDLE state
+//!    - Reset all state variables
+//! ************************************************************************
+
 //* ************************************************************************
 //* ************************ MOTOR RETURN OPERATIONS FOR YESWOOD *********
 //* ************************************************************************

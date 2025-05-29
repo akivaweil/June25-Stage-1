@@ -13,6 +13,39 @@ extern bool isReloadMode;
 //! RELOAD-specific functions for safe manual wood loading/unloading
 //! These functions provide a safe mode for manual access to the machine
 
+//! ************************************************************************
+//! RELOAD STATE SEQUENCE:
+//! ************************************************************************
+//! STEP 1: RETRACT ALL CLAMPS FOR SAFE ACCESS (ONE TIME)
+//!    - Retract position clamp for safe access
+//!    - Retract wood secure clamp for safe access
+//!    - Retract catcher clamp for safe access
+//!    - Create safe working environment for manual operation
+//!
+//! STEP 2: SET RELOAD MODE FLAG (ONE TIME)
+//!    - Set isReloadMode flag to true
+//!    - Indicate system is in safe manual mode
+//!    - Enable reload-specific behaviors
+//!
+//! STEP 3: MONITOR RELOAD SWITCH FOR EXIT CONDITION (CONTINUOUS)
+//!    - Continuously monitor reload switch state
+//!    - Update switch debounce state
+//!    - When switch reads LOW: prepare to exit reload mode
+//!    - User indicates reload operation complete
+//!
+//! STEP 4: RE-ENGAGE CLAMPS AND EXIT RELOAD MODE (ONE TIME)
+//!    - Set isReloadMode flag to false
+//!    - Extend position clamp to operational state
+//!    - Extend wood secure clamp to operational state
+//!    - Restore operational clamp configuration
+//!
+//! STEP 5: TRANSITION TO IDLE STATE (ONE TIME)
+//!    - Transition from RELOAD to IDLE state
+//!    - Reset all state variables for next cycle
+//!    - System ready for normal operation
+//!    - Reload sequence complete
+//! ************************************************************************
+
 //* ************************************************************************
 //* ************************ CLAMP OPERATIONS FOR RELOAD *****************
 //* ************************************************************************

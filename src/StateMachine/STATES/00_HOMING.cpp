@@ -11,6 +11,35 @@
 //! Cut motor: Home to negative direction, stop on switch, set position to 0
 //! Position motor: Home to positive direction, stop on switch, set position calculated from travel distance
 
+//! ************************************************************************
+//! HOMING STATE SEQUENCE:
+//! ************************************************************************
+//! STEP 1: INITIALIZE HOMING
+//!    - Set isHomed flag to false
+//!    - Prepare both motors for homing sequence
+//!
+//! STEP 2: HOME CUT MOTOR (BLOCKING)
+//!    - Set cut motor speed to CUT_MOTOR_HOMING_SPEED
+//!    - Move cut motor in CUT_HOMING_DIRECTION
+//!    - Monitor cut homing switch continuously
+//!    - Stop motor when switch reads HIGH
+//!    - Set current position to 0
+//!    - Handle timeout conditions
+//!
+//! STEP 3: HOME POSITION MOTOR (BLOCKING)
+//!    - Set position motor speed to POSITION_MOTOR_HOMING_SPEED
+//!    - Move position motor in POSITION_HOMING_DIRECTION
+//!    - Monitor position homing switch continuously
+//!    - Stop motor when switch reads HIGH
+//!    - Set current position to POSITION_MOTOR_TRAVEL_POSITION + 1 inch
+//!    - Move to travel position after homing
+//!
+//! STEP 4: COMPLETE HOMING SEQUENCE
+//!    - Set isHomed flag to true
+//!    - Report completion status
+//!    - Motors ready for operation
+//! ************************************************************************
+
 // External variable declarations
 extern AccelStepper cutMotor;
 extern AccelStepper positionMotor;

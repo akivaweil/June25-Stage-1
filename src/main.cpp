@@ -187,8 +187,6 @@ void setup() {
 }
 
 void loop() {
-  // Re-enable state machine to test if it causes watchdog reset issue
-  
   // Execute the state machine
   updateStateMachine();
   
@@ -197,7 +195,4 @@ void loop() {
   
   // Prevent watchdog reset
   yield();
-  
-  // Add delay to slow down debug output
-  delay(5);
 } 
