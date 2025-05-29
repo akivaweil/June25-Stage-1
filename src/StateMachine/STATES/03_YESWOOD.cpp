@@ -76,8 +76,8 @@ void returnCutMotorToHomeForYeswood() {
 }
 
 void retractSecureClampForYeswood() {
-    retractClamp(WOOD_SECURE_CLAMP_ENUM);
-    Serial.println("YESWOOD: Secure wood clamp retracted");
+    retractWoodSecureClamp();
+    Serial.println("YESWOOD: Secure wood clamp retracted for wood transfer");
 }
 
 void advancePositionMotorForYeswood() {
@@ -93,11 +93,11 @@ void advancePositionMotorForYeswood() {
 //* ************************************************************************
 
 void swapClampPositionsForYeswood() {
-    // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    extendClamp(WOOD_SECURE_CLAMP_ENUM);
+    // Use individual clamp functions
+    extendWoodSecureClamp();
     Serial.println("YESWOOD: Secure wood clamp extended for wood transfer");
     
-    retractClamp(POSITION_CLAMP_ENUM);
+    retractPositionClamp();
     Serial.println("YESWOOD: Position clamp retracted for wood transfer");
     
     Serial.println("YESWOOD: Clamp positions swapped for wood advancement");
@@ -110,7 +110,7 @@ void returnPositionMotorToHomeForYeswood() {
 
 void extendPositionClampWhenHomeForYeswood() {
     if (positionMotor.distanceToGo() == 0 && positionMotor.currentPosition() == 0) {
-        extendClamp(POSITION_CLAMP_ENUM);
+        extendPositionClamp();
         Serial.println("YESWOOD: Position clamp extended - position motor at home");
     }
 }
@@ -263,14 +263,14 @@ void executeYeswoodSequence() {
 }
 
 void reactivateSecureClampForYeswood() {
-    extendClamp(WOOD_SECURE_CLAMP_ENUM);
+    extendWoodSecureClamp();
     Serial.println("YESWOOD: Secure wood clamp re-extended");
     
-    retractClamp(POSITION_CLAMP_ENUM);
+    retractPositionClamp();
     Serial.println("YESWOOD: Position clamp retracted");
 }
 
 void setFinalClampStateForYeswood() {
-    extendClamp(POSITION_CLAMP_ENUM);
+    extendPositionClamp();
     Serial.println("YESWOOD: Position clamp extended - final operational state");
 } 

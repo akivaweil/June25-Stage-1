@@ -50,9 +50,9 @@ extern SystemState currentState;
 //* ************************************************************************
 
 void activateClampingForCutting() {
-    // Use existing clamp functions from CLAMPS_FUNCTIONS.cpp
-    extendClampSimple(POSITION_CLAMP_ID);
-    extendClampSimple(WOOD_SECURE_CLAMP_ID);
+    // Use individual clamp functions
+    extendPositionClamp();
+    extendWoodSecureClamp();
     Serial.println("CUTTING: Position and wood secure clamps activated");
 }
 
@@ -88,8 +88,8 @@ bool checkCatcherClampActivationPoint() {
     float activationPosition = CUT_MOTOR_CUT_POSITION - (CATCHER_CLAMP_EARLY_ACTIVATION_OFFSET_INCHES * CUT_MOTOR_STEPS_PER_INCH);
     
     if (cutMotor.currentPosition() >= activationPosition) {
-        // Use existing cylinder function from 99_CYLINDER_FUNCTIONS.cpp
-        extendClampSimple(CATCHER_CLAMP_ID);
+        // Use individual clamp function
+        extendCatcherClamp();
         Serial.println("CUTTING: Catcher clamp activated at early activation offset");
         return true;
     }

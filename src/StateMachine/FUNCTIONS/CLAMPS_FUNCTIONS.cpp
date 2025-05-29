@@ -17,25 +17,62 @@ extern bool catcherClampIsEngaged;
 #define CATCHER_CLAMP_ID 2
 
 //* ************************************************************************
-//* ************************ PNEUMATIC CLAMP FUNCTIONS *******************
+//* ************************ INDIVIDUAL CLAMP FUNCTIONS ******************
 //* ************************************************************************
+//! Individual functions for each clamp - PREFERRED USAGE
+
+// Position Clamp Functions
+void extendPositionClamp() {
+    digitalWrite(POSITION_CLAMP, LOW);
+    Serial.println("Position clamp extended");
+}
+
+void retractPositionClamp() {
+    digitalWrite(POSITION_CLAMP, HIGH);
+    Serial.println("Position clamp retracted");
+}
+
+// Wood Secure Clamp Functions
+void extendWoodSecureClamp() {
+    digitalWrite(WOOD_SECURE_CLAMP, LOW);
+    Serial.println("Wood secure clamp extended");
+}
+
+void retractWoodSecureClamp() {
+    digitalWrite(WOOD_SECURE_CLAMP, HIGH);
+    Serial.println("Wood secure clamp retracted");
+}
+
+// Catcher Clamp Functions
+void extendCatcherClamp() {
+    digitalWrite(CATCHER_CLAMP_PIN, LOW);
+    catcherClampEngageTime = millis();
+    catcherClampIsEngaged = true;
+    Serial.println("Catcher clamp extended");
+}
+
+void retractCatcherClamp() {
+    digitalWrite(CATCHER_CLAMP_PIN, HIGH);
+    catcherClampIsEngaged = false;
+    Serial.println("Catcher clamp retracted");
+}
+
+//* ************************************************************************
+//* ************************ LEGACY PNEUMATIC CLAMP FUNCTIONS ************
+//* ************************************************************************
+//! Legacy enum-based functions - KEPT FOR COMPATIBILITY
 
 // Internal enum-based functions
 void extendClamp(ClampType clamp) {
     switch(clamp) {
         case POSITION_CLAMP_ENUM:
-            digitalWrite(POSITION_CLAMP, LOW);
-            Serial.println("Position clamp extended");
+            extendPositionClamp();
             break;
         case WOOD_SECURE_CLAMP_ENUM:
-            digitalWrite(WOOD_SECURE_CLAMP, LOW);
-            Serial.println("Wood secure clamp extended");
+            extendWoodSecureClamp();
             break;
         case CATCHER_CLAMP_ENUM:
-            digitalWrite(CATCHER_CLAMP_PIN, LOW);
-            catcherClampEngageTime = millis();
-            catcherClampIsEngaged = true;
-            Serial.println("Catcher clamp extended");
+            extendCatcherClamp();
             break;
         default:
             Serial.println("ERROR: Unknown clamp type for extend operation");
@@ -46,17 +83,13 @@ void extendClamp(ClampType clamp) {
 void retractClamp(ClampType clamp) {
     switch(clamp) {
         case POSITION_CLAMP_ENUM:
-            digitalWrite(POSITION_CLAMP, HIGH);
-            Serial.println("Position clamp retracted");
+            retractPositionClamp();
             break;
         case WOOD_SECURE_CLAMP_ENUM:
-            digitalWrite(WOOD_SECURE_CLAMP, HIGH);
-            Serial.println("Wood secure clamp retracted");
+            retractWoodSecureClamp();
             break;
         case CATCHER_CLAMP_ENUM:
-            digitalWrite(CATCHER_CLAMP_PIN, HIGH);
-            catcherClampIsEngaged = false;
-            Serial.println("Catcher clamp retracted");
+            retractCatcherClamp();
             break;
         default:
             Serial.println("ERROR: Unknown clamp type for retract operation");
@@ -68,13 +101,13 @@ void retractClamp(ClampType clamp) {
 void extendClampSimple(int clampId) {
     switch(clampId) {
         case POSITION_CLAMP_ID:
-            extendClamp(POSITION_CLAMP_ENUM);
+            extendPositionClamp();
             break;
         case WOOD_SECURE_CLAMP_ID:
-            extendClamp(WOOD_SECURE_CLAMP_ENUM);
+            extendWoodSecureClamp();
             break;
         case CATCHER_CLAMP_ID:
-            extendClamp(CATCHER_CLAMP_ENUM);
+            extendCatcherClamp();
             break;
         default:
             Serial.println("ERROR: Unknown clamp ID for extend operation");
@@ -85,13 +118,13 @@ void extendClampSimple(int clampId) {
 void retractClampSimple(int clampId) {
     switch(clampId) {
         case POSITION_CLAMP_ID:
-            retractClamp(POSITION_CLAMP_ENUM);
+            retractPositionClamp();
             break;
         case WOOD_SECURE_CLAMP_ID:
-            retractClamp(WOOD_SECURE_CLAMP_ENUM);
+            retractWoodSecureClamp();
             break;
         case CATCHER_CLAMP_ID:
-            retractClamp(CATCHER_CLAMP_ENUM);
+            retractCatcherClamp();
             break;
         default:
             Serial.println("ERROR: Unknown clamp ID for retract operation");
@@ -101,15 +134,15 @@ void retractClampSimple(int clampId) {
 
 // Collective Operations
 void retractAllCylinders() {
-    retractClamp(POSITION_CLAMP_ENUM);
-    retractClamp(WOOD_SECURE_CLAMP_ENUM);
-    retractClamp(CATCHER_CLAMP_ENUM);
+    retractPositionClamp();
+    retractWoodSecureClamp();
+    retractCatcherClamp();
     Serial.println("All cylinders retracted");
 }
 
 void extendAllCylinders() {
-    extendClamp(POSITION_CLAMP_ENUM);
-    extendClamp(WOOD_SECURE_CLAMP_ENUM);
-    extendClamp(CATCHER_CLAMP_ENUM);
+    extendPositionClamp();
+    extendWoodSecureClamp();
+    extendCatcherClamp();
     Serial.println("All cylinders extended");
 } 

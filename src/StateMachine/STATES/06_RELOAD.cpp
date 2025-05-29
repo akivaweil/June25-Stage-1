@@ -51,17 +51,17 @@ extern bool isReloadMode;
 //* ************************************************************************
 
 void retractAllClampsForReload() {
-    // Use existing cylinder functions
-    retractClampSimple(POSITION_CLAMP_ID);
-    retractClampSimple(WOOD_SECURE_CLAMP_ID);
-    retractClampSimple(CATCHER_CLAMP_ID);
+    // Use individual clamp functions
+    retractPositionClamp();
+    retractWoodSecureClamp();
+    retractCatcherClamp();
     Serial.println("RELOAD: All clamps retracted");
 }
 
 void setOperationalClampsForReload() {
-    // Use existing cylinder functions 
-    extendClampSimple(POSITION_CLAMP_ID);
-    extendClampSimple(WOOD_SECURE_CLAMP_ID);
+    // Use individual clamp functions
+    extendPositionClamp();
+    extendWoodSecureClamp();
     Serial.println("RELOAD: Operational clamps set (position and wood secure extended)");
 }
 

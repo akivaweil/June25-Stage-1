@@ -110,7 +110,15 @@ void movePositionMotorToTravelWithEarlyActivation();
 void movePositionMotorToInitialAfterHoming();
 void moveCutMotorToHome();
 
-// Clamp Control Functions
+// Individual Clamp Control Functions - PREFERRED USAGE
+void extendPositionClamp();
+void retractPositionClamp();
+void extendWoodSecureClamp();
+void retractWoodSecureClamp();
+void extendCatcherClamp();
+void retractCatcherClamp();
+
+// Legacy Clamp Control Functions - KEPT FOR COMPATIBILITY
 void extendClamp(ClampType clamp);
 void retractClamp(ClampType clamp);
 void extendClampSimple(int clampId);

@@ -71,25 +71,25 @@ extern SystemState currentState;
 //* ************************************************************************
 
 void retractPositionClampForPushWood() {
-    retractClampSimple(POSITION_CLAMP_ID);
+    retractPositionClamp();
     Serial.println("PUSHWOOD: Position clamp retracted");
 }
 
 void swapToSecureControlForPushWood() {
-    // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    extendClampSimple(POSITION_CLAMP_ID);
+    // Use individual clamp functions
+    extendPositionClamp();
     Serial.println("PUSHWOOD: Position clamp extended for wood control");
     
-    retractClampSimple(WOOD_SECURE_CLAMP_ID);
+    retractWoodSecureClamp();
     Serial.println("PUSHWOOD: Secure wood clamp retracted - position clamp taking control");
 }
 
 void swapToPositionControlForPushWood() {
-    // Use existing cylinder functions from 99_CYLINDER_FUNCTIONS.cpp
-    retractClampSimple(POSITION_CLAMP_ID);
+    // Use individual clamp functions
+    retractPositionClamp();
     Serial.println("PUSHWOOD: Position clamp retracted");
     
-    extendClampSimple(WOOD_SECURE_CLAMP_ID);
+    extendWoodSecureClamp();
     Serial.println("PUSHWOOD: Secure wood clamp extended - securing wood for final positioning");
 }
 
@@ -164,10 +164,10 @@ void executePushWoodForwardSequence() {
     //! STEP 2: MOVE POSITION MOTOR TO TRAVEL POSITION
     //! ************************************************************************
     if (positionClampRetracted && !positionMotorToHome) {
-        extendClampSimple(POSITION_CLAMP_ID);
+        extendPositionClamp();
         Serial.println("PUSHWOODFORWARD: Position clamp extended");
         
-        retractClampSimple(WOOD_SECURE_CLAMP_ID);
+        retractWoodSecureClamp();
         Serial.println("PUSHWOODFORWARD: Wood secure clamp retracted");
         
         advancePositionMotorForPushWood();
@@ -180,10 +180,10 @@ void executePushWoodForwardSequence() {
     if (positionMotorToHome && !clampsSwappedToSecure) {
         positionMotor.run();
         if (positionMotor.distanceToGo() == 0) {
-            retractClampSimple(POSITION_CLAMP_ID);
+            retractPositionClamp();
             Serial.println("PUSHWOODFORWARD: Position clamp retracted when motor reaches travel");
             
-            extendClampSimple(WOOD_SECURE_CLAMP_ID);
+            extendWoodSecureClamp();
             Serial.println("PUSHWOODFORWARD: Wood secure clamp extended");
             clampsSwappedToSecure = true;
         }

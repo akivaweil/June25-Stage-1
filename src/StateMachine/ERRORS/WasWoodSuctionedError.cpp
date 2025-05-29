@@ -65,8 +65,8 @@ void handleWoodSuctionError() {
         stopPositionMotor();
         
         // Retract safety components
-        retractClampSimple(POSITION_CLAMP_ID);
-        retractClampSimple(WOOD_SECURE_CLAMP_ID);
+        retractPositionClamp();
+        retractWoodSecureClamp();
         
         // Set error LED pattern
         turnRedLedOn();
@@ -132,10 +132,16 @@ void attemptWoodSuctionRecovery() {
     }
 }
 
-void retractPositionAndSecureClampsForError() {
-    retractClampSimple(POSITION_CLAMP_ID);
-    retractClampSimple(WOOD_SECURE_CLAMP_ID);
-    Serial.println("ERROR: Position and secure clamps retracted for safety");
+void retractAllClampsForError() {
+    retractPositionClamp();
+    retractWoodSecureClamp();
+    Serial.println("WASWOODSUCTIONED ERROR: Position and secure clamps retracted for safety");
+}
+
+void retractAllClampsOnErrorAcknowledge() {
+    retractPositionClamp();
+    retractWoodSecureClamp();
+    Serial.println("WASWOODSUCTIONED ERROR: All clamps retracted on error acknowledgment");
 }
 
 //* ************************************************************************
