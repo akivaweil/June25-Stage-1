@@ -1,5 +1,4 @@
 #include "StateMachine/StateMachine.h"
-#include "StateMachine/SensorFunctions.h"
 #include <Arduino.h>
 
 //* ************************************************************************
@@ -11,6 +10,7 @@
 // External variable declarations
 extern bool woodSuctionError;
 extern SystemState currentState;
+extern Bounce wasWoodSuctionedSensor;
 
 // Error state variables
 bool woodSuctionErrorDetected = false;
@@ -25,7 +25,9 @@ unsigned long lastSuctionCheck = 0;
 void checkWoodSuctionError() {
     // Check wood suction sensor periodically
     if (millis() - lastSuctionCheck > 100) { // Check every 100ms
-        bool woodSuctioned = readWoodSuctionSensor(); // Use proper sensor function
+        // Direct Bounce2 reading - wood suction sensor is active LOW with input pullup
+        wasWoodSuctionedSensor.update();
+        bool woodSuctioned = (wasWoodSuctionedSensor.read() == LOW);
         
         // If wood should be suctioned but sensor doesn't detect it
         if (!woodSuctioned && currentState == YESWOOD) {
@@ -123,7 +125,8 @@ void attemptWoodSuctionRecovery() {
         delay(2000); // Wait 2 seconds
         
         // Check if recovery was successful
-        if (readWoodSuctionSensor()) {
+        wasWoodSuctionedSensor.update();
+        if (wasWoodSuctionedSensor.read() == LOW) {
             Serial.println("Wood suction recovery successful");
             resetWoodSuctionError();
         } else {
@@ -157,6 +160,6 @@ void printWoodSuctionErrorStatus() {
     Serial.print("Error Handled: ");
     Serial.println(woodSuctionErrorHandled ? "YES" : "NO");
     Serial.print("Suction Sensor State: ");
-    Serial.println(readWoodSuctionSensor() ? "ACTIVE" : "INACTIVE");
+    Serial.println(wasWoodSuctionedSensor.read() ? "ACTIVE" : "INACTIVE");
     Serial.println("==================================");
 } 

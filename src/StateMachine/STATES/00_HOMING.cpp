@@ -57,7 +57,12 @@ void homeCutMotorBlocking(Bounce& homingSwitch, unsigned long timeout) {
     unsigned long startTime = millis();
     moveMotorTo(CUT_MOTOR, CUT_HOMING_DIRECTION * CUT_MOTOR_HOMING_DISTANCE, CUT_MOTOR_HOMING_SPEED);
 
-    while (!readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE)) {
+    while (true) {
+        // Direct Bounce2 reading - cut motor homing switch is active HIGH with input pulldown
+        cutHomingSwitch.update();
+        if (cutHomingSwitch.read() == HIGH) {
+            break; // Homing switch activated
+        }
         cutMotor.run();
         //! Handle OTA updates
         handleOTA();
@@ -78,7 +83,12 @@ void homePositionMotorBlocking(Bounce& homingSwitch, unsigned long timeout) {
     unsigned long startTime = millis();
     moveMotorTo(POSITION_MOTOR, POSITION_HOMING_DIRECTION * POSITION_MOTOR_HOMING_DISTANCE, POSITION_MOTOR_HOMING_SPEED);
 
-    while (!readLimitSwitch(POSITION_MOTOR_HOMING_SWITCH_TYPE)) {
+    while (true) {
+        // Direct Bounce2 reading - position motor homing switch is active HIGH with input pulldown
+        positionHomingSwitch.update();
+        if (positionHomingSwitch.read() == HIGH) {
+            break; // Homing switch activated
+        }
         positionMotor.run();
         //! Handle OTA updates
         handleOTA();
@@ -138,9 +148,11 @@ bool checkAndRecalibrateCutMotorHome(int attempts) {
         Serial.print("Cut position switch read attempt "); 
         Serial.print(i + 1); 
         Serial.print(": "); 
-        Serial.println(readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE));
+        // Direct Bounce2 reading - cut motor homing switch is active HIGH with input pulldown
+        cutHomingSwitch.update();
+        Serial.println(cutHomingSwitch.read() == HIGH);
         
-        if (readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE)) {
+        if (cutHomingSwitch.read() == HIGH) {
             sensorDetectedHome = true;
             cutMotor.setCurrentPosition(0);
             Serial.println("Cut motor position recalibrated to 0");

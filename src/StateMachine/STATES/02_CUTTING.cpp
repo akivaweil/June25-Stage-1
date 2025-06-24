@@ -6,8 +6,10 @@
 // External variable declarations
 extern AccelStepper cutMotor;
 extern AccelStepper positionMotor;
+extern Bounce cutHomingSwitch;
 extern Bounce woodSensor;
 extern Bounce wasWoodSuctionedSensor;
+extern Bounce startCycleSwitch;
 extern SystemState currentState;
 
 //* ************************************************************************
@@ -72,7 +74,9 @@ bool checkCutMotorSafetyAt03Inches() {
     
     // Check if motor has reached 0.3 inches
     if (cutMotor.currentPosition() >= safetyCheckPosition) {
-        if (readSensor(WOOD_SUCTION_SENSOR_TYPE)) {
+        // Direct Bounce2 reading - wood suction sensor is active LOW with input pullup
+        wasWoodSuctionedSensor.update();
+        if (wasWoodSuctionedSensor.read() == LOW) {
             Serial.println("CUTTING: SAFETY VIOLATION - Wood suctioned sensor activated at 0.3 inches");
             cutMotor.stop();
             // TODO: Enter waswoodsuctioned error state
@@ -113,12 +117,23 @@ bool checkCatcherServoActivationPoint() {
 //* ************************ WOOD SENSOR CHECKING FOR CUTTING ************
 //* ************************************************************************
 
+bool checkRunCycleSwitchBeforeCutting() {
+    startCycleSwitch.update();
+    if (startCycleSwitch.read() == LOW) {
+        Serial.println("CUTTING: Run cycle switch LOW - aborting cutting and returning to IDLE");
+        currentState = IDLE;
+        return false;
+    }
+    return true;
+}
+
 bool checkWoodSensorForStateTransition() {
-    bool sensorReading = readSensor(WOOD_SENSOR_TYPE);
+    // Direct Bounce2 reading - wood sensor is active LOW with input pullup
+    woodSensor.update();
+    bool sensorReading = (woodSensor.read() == LOW);
     Serial.print("CUTTING: Wood sensor reading: ");
     Serial.print(sensorReading ? "DETECTED (LOW)" : "NOT DETECTED (HIGH)");
     Serial.print(" - Raw pin reading: ");
-    woodSensor.update();
     Serial.println(woodSensor.read());
     
     if (sensorReading) {
@@ -142,6 +157,24 @@ void executeCuttingSequence() {
     static bool safetyChecked = false;
     static bool catcherClampActivated = false;
     static bool catcherServoActivated = false;
+    static bool runCycleSwitchChecked = false;
+    
+    //! ************************************************************************
+    //! STEP 0: CHECK RUN CYCLE SWITCH (ONE TIME)
+    //! ************************************************************************
+    if (!runCycleSwitchChecked) {
+        if (!checkRunCycleSwitchBeforeCutting()) {
+            // Reset state variables and abort cutting
+            clampsExtended = false;
+            cutMotorStarted = false;
+            safetyChecked = false;
+            catcherClampActivated = false;
+            catcherServoActivated = false;
+            runCycleSwitchChecked = false;
+            return;
+        }
+        runCycleSwitchChecked = true;
+    }
     
     //! ************************************************************************
     //! STEP 1: EXTEND BOTH CLAMPS (ONE TIME)
@@ -201,5 +234,6 @@ void executeCuttingSequence() {
         safetyChecked = false;
         catcherClampActivated = false;
         catcherServoActivated = false;
+        runCycleSwitchChecked = false;
     }
 }

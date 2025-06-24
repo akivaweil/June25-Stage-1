@@ -53,7 +53,7 @@ const float CUT_MOTOR_RETURN_SPEED = 20000;     // Speed for returning after a c
 const float CUT_MOTOR_RETURN_ACCELERATION = 30000; // Acceleration for return moves (steps/sec^2)
 
 // Homing Operation (Homing State)
-const float CUT_MOTOR_HOMING_SPEED = 1000;      // Speed for homing the cut motor (steps/sec)
+const float CUT_MOTOR_HOMING_SPEED = 1500;      // Speed for homing the cut motor (steps/sec)
 
 //* ************************************************************************
 //* ************************ POSITION MOTOR SPEED SETTINGS ***************
@@ -67,7 +67,7 @@ const float POSITION_MOTOR_RETURN_SPEED = 20000;    // Speed for returning to ho
 const float POSITION_MOTOR_RETURN_ACCELERATION = 20000; // Acceleration for return moves (steps/sec^2)
 
 // Homing Operation (Homing State)
-const float POSITION_MOTOR_HOMING_SPEED = 1000;     // Speed for homing the position motor (steps/sec)
+const float POSITION_MOTOR_HOMING_SPEED = 1500;     // Speed for homing the position motor (steps/sec)
 
 //* ************************************************************************
 //* ************************ TIMING CONFIGURATION *************************

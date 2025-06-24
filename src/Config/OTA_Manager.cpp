@@ -1,33 +1,9 @@
-/*
- * OTA_Manager.cpp - Over-The-Air Update Manager for ESP32
- * 
- * SETUP INSTRUCTIONS:
- * 1. Copy this file (OTA_Manager.cpp) and OTA_Manager.h to your project's src/ and include/ folders
- * 2. Copy the platformio.ini configuration (OTA environments)
- * 3. In your main.cpp:
- *    - #include "OTA_Manager.h"
- *    - Call initOTA() in setup()
- *    - Call handleOTA() in loop()
- * 4. Update WiFi credentials in OTA_Manager.h if different from Everwood network
- * 5. Change IP address in platformio.ini to match your ESP32's IP
- * 
- * USAGE:
- * - Use 'pio run -t upload -e freenove_esp32_wrover' for OTA uploads
- * - Monitor serial output to see IP address assigned to ESP32
- * - Update platformio.ini upload_port with the assigned IP
- * 
- * NETWORK REQUIREMENTS:
- * - ESP32 and computer must be on same network
- * - Port 3232 must be open for OTA communication
- */
-
-#include "OTA_Manager.h"
-#include "StateMachine/WebSocket_Manager.h"
+#include "Config/OTA_Manager.h"
+#include "StateMachine/WebSocket_Manager.h" // For OTA status updates
 
 //* ************************************************************************
 //* ************************ NETWORK CONFIGURATION **********************
 //* ************************************************************************
-// WiFi credentials - update if using different network
 const char* WIFI_SSID = "Everwood";
 const char* WIFI_PASSWORD = "Everwood-Staff";
 

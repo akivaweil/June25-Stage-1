@@ -7,6 +7,7 @@
 #include "Config/Pins_Definitions.h"
 #include "StateMachine/StateMachine.h"
 #include "OTA_Manager.h"
+#include "StateMachine/WebSocket_Manager.h"
 
 //* ************************************************************************
 //* ************************ AUTOMATED TABLE SAW **************************
@@ -74,16 +75,45 @@ bool signalTAActive = false;      // For Transfer Arm signal
 // New flag to track cut motor return during YES_WOOD mode
 bool cutMotorInYesWoodReturn = false;
 
+unsigned long bootTime = 0;
+
 void setup() {
   Serial.begin(115200);
-  Serial.println("Automated Table Saw Control System - Stage 1");
-  Serial.println("DIAGNOSTIC VERSION - Adding OTA/WiFi");
+  // It's important to initialize Serial first before SerialWS_ functions are used by other modules.
+  // However, critical boot messages can be sent directly via Serial if SerialWS isn't ready.
+  Serial.println("\n=== ESP32-S3 System Booting ===");
+  bootTime = millis();
+  Serial.printf("Boot initiated at: %lu ms\n", bootTime);
 
-  //! Initialize OTA functionality
-  Serial.println("Initializing OTA...");
-  initOTA();
-  Serial.println("OTA initialization complete");
-  
+  // Initialize WiFi first, as WebSocket and OTA depend on it.
+  initWiFi(); 
+
+  // Now that WiFi (potentially) is up, and Serial is up, SerialWS_ functions can be used.
+  SerialWS_println("\n=== ESP32-S3 System Starting ===");
+  SerialWS_printf("Boot time: %lu ms\n", bootTime);
+
+  if(WiFi.status() == WL_CONNECTED){
+    SerialWS_println("WiFi connected successfully.");
+    displayIP(); // Display IP and other network info
+    
+    initOTA(); // Initialize OTA after WiFi
+    SerialWS_println("OTA ready.");
+    
+    initWebSocket(); // Initialize WebSocket after WiFi
+    SerialWS_println("WebSocket ready.");
+    
+  } else {
+    SerialWS_println("WiFi connection FAILED. OTA and WebSocket services will not be available.");
+    SerialWS_println("Please check WiFi credentials in Config/OTA_Manager.cpp and reset the device.");
+  }
+
+  SerialWS_println("\n=== System Initialization Complete ===");
+  if(WiFi.status() == WL_CONNECTED){
+    SerialWS_println("System ready for operation with OTA and WebSocket.");
+  } else {
+    SerialWS_println("System ready (limited functionality due to WiFi failure).");
+  }
+
   //! Configure basic pin modes
   pinMode(CUT_MOTOR_PULSE_PIN, OUTPUT);
   pinMode(CUT_MOTOR_DIR_PIN, OUTPUT);
@@ -187,12 +217,10 @@ void setup() {
 }
 
 void loop() {
-  // Execute the state machine
-  updateStateMachine();
-  
-  //! Handle OTA updates
-  handleOTA();
-  
-  // Prevent watchdog reset
-  yield();
+  if (WiFi.status() == WL_CONNECTED) {
+    handleOTA();        // Handle Over-The-Air updates
+    handleWebSocket();  // Handle WebSocket connections and messages
+  }
+  // Add other loop tasks here if needed
+  delay(10); // Small delay to keep the system responsive
 } 

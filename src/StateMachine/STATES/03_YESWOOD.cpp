@@ -8,6 +8,7 @@ extern AccelStepper cutMotor;
 extern AccelStepper positionMotor;
 extern Bounce cutHomingSwitch;
 extern Bounce startCycleSwitch;
+extern Bounce reloadSwitch;
 extern SystemState currentState;
 
 //* ************************************************************************
@@ -59,7 +60,7 @@ extern SystemState currentState;
 //!    - Execute motor movements continuously
 //!    - Maintain motion toward targets
 //!
-//! STEP 9: CHECK CYCLE CONTINUATION (WHEN SEQUENCE COMPLETE)
+//! STEP 9: CHECK FOR COMPLETION AND TRANSITION TO CUTTING
 //!    - Monitor start cycle switch state
 //!    - If HIGH: transition to CUTTING for next cycle
 //!    - If LOW: transition to IDLE state
@@ -124,7 +125,9 @@ bool checkCutMotorHomeAndSensorForYeswood() {
     if (cutMotor.distanceToGo() == 0 && cutMotor.currentPosition() == 0) {
         // Wait 10ms then check homing sensor
         delay(10);
-        if (readLimitSwitch(CUT_MOTOR_HOMING_SWITCH_TYPE)) {
+        // Direct Bounce2 reading - cut motor homing switch is active HIGH with input pulldown
+        cutHomingSwitch.update();
+        if (cutHomingSwitch.read() == HIGH) {
             Serial.println("YESWOOD: Cut motor confirmed at home position");
             return true;
         } else {
@@ -151,10 +154,20 @@ bool checkRunCycleSwitchForYeswood() {
         currentState = CUTTING;
         return true;
     } else {
-        Serial.println("YESWOOD: Run cycle switch not HIGH - returning to IDLE");
+        Serial.println("YESWOOD: Run cycle switch LOW - transitioning to IDLE");
         currentState = IDLE;
+        return false;
+    }
+}
+
+bool checkReloadSwitchForYeswood() {
+    reloadSwitch.update();
+    if (reloadSwitch.read() == HIGH) {
+        Serial.println("YESWOOD: Reload switch activated - transitioning to RELOAD");
+        currentState = RELOAD;
         return true;
     }
+    return false;
 }
 
 //* ************************************************************************
@@ -245,9 +258,24 @@ void executeYeswoodSequence() {
     positionMotor.run();
     
     //! ************************************************************************
-    //! STEP 9: CHECK FOR CYCLE CONTINUATION
+    //! STEP 9: CHECK FOR COMPLETION AND TRANSITION TO CUTTING
     //! ************************************************************************
     if (finalAdvanceStarted && positionMotor.distanceToGo() == 0) {
+        // Check for manual reload intervention first
+        if (checkReloadSwitchForYeswood()) {
+            // Reset state variables and transition to RELOAD
+            cutMotorReturnStarted = false;
+            secureClampRetracted = false;
+            positionMotorAdvanced = false;
+            clampsSwapped = false;
+            cutMotorHomeVerified = false;
+            positionMotorHomeStarted = false;
+            positionClampExtended = false;
+            finalAdvanceStarted = false;
+            return;
+        }
+        
+        // checkRunCycleSwitchForYeswood will set currentState to CUTTING or IDLE
         checkRunCycleSwitchForYeswood();
         
         // Reset state variables for next cycle

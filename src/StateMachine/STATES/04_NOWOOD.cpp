@@ -7,6 +7,8 @@
 extern AccelStepper cutMotor;
 extern AccelStepper positionMotor;
 extern SystemState currentState;
+extern Bounce startCycleSwitch;
+extern Bounce reloadSwitch;
 
 //* ************************************************************************
 //* ************************ NOWOOD FUNCTIONS ****************************
@@ -47,9 +49,9 @@ extern SystemState currentState;
 //!    - Execute motor movements continuously
 //!    - Maintain motion toward targets
 //!
-//! STEP 7: CHECK FOR COMPLETION AND TRANSITION TO IDLE
+//! STEP 7: CHECK FOR COMPLETION AND TRANSITION TO CUTTING
 //!    - Monitor both motors for completion
-//!    - When both motors reach targets: transition to IDLE
+//!    - When both motors reach targets: transition to CUTTING
 //!    - Reset all state variables for next cycle
 //!    - System ready for new operation
 //! ************************************************************************
@@ -95,6 +97,29 @@ void advancePositionMotorToTravelForNowood() {
 //* ************************************************************************
 //* ************************ STATE TRANSITION FOR NOWOOD *****************
 //* ************************************************************************
+
+bool checkRunCycleSwitchForNowood() {
+    startCycleSwitch.update();
+    if (startCycleSwitch.read() == HIGH) {
+        Serial.println("NOWOOD: Run cycle switch HIGH - continuing to CUTTING");
+        currentState = CUTTING;
+        return true;
+    } else {
+        Serial.println("NOWOOD: Run cycle switch LOW - transitioning to IDLE");
+        currentState = IDLE;
+        return false;
+    }
+}
+
+bool checkReloadSwitchForNowood() {
+    reloadSwitch.update();
+    if (reloadSwitch.read() == HIGH) {
+        Serial.println("NOWOOD: Reload switch activated - transitioning to RELOAD");
+        currentState = RELOAD;
+        return true;
+    }
+    return false;
+}
 
 void transitionFromNowoodToIdle() {
     Serial.println("NOWOOD -> IDLE: Returning to idle state - ready for next cycle");
@@ -161,17 +186,29 @@ void executeNowoodSequence() {
     positionMotor.run();
     
     //! ************************************************************************
-    //! STEP 7: CHECK FOR COMPLETION AND TRANSITION TO IDLE
+    //! STEP 7: CHECK FOR COMPLETION AND TRANSITION TO CUTTING
     //! ************************************************************************
     if (positionMotorToTravel && cutMotorReturnStarted) {
         bool cutMotorDone = (cutMotor.distanceToGo() == 0);
         bool positionMotorDone = (positionMotor.distanceToGo() == 0);
         
         if (cutMotorDone && positionMotorDone) {
-            Serial.println("NOWOOD: Both motors complete - transitioning to IDLE");
-            currentState = IDLE;
+            // Check for manual reload intervention first
+            if (checkReloadSwitchForNowood()) {
+                // Reset state variables and transition to RELOAD
+                secureClampRetracted = false;
+                positionMotorToNegOne = false;
+                clampsReset = false;
+                cutMotorReturnStarted = false;
+                positionMotorToTravel = false;
+                return;
+            }
+            
+            // checkRunCycleSwitchForNowood will set currentState to CUTTING or IDLE
+            checkRunCycleSwitchForNowood();
             
             // Reset state variables for next cycle
+            secureClampRetracted = false;
             positionMotorToNegOne = false;
             clampsReset = false;
             cutMotorReturnStarted = false;
