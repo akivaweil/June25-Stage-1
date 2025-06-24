@@ -39,28 +39,20 @@ extern SystemState currentState;
 //!    - Retract position clamp for motor return
 //!    - Transfer wood control between clamps
 //!
-//! STEP 5: START POSITION MOTOR RETURN (WHEN CLAMPS SWAPPED)
-//!    - Move position motor back to home position (0)
-//!    - Prepare for next positioning cycle
-//!
-//! STEP 6: EXTEND POSITION CLAMP (WHEN POSITION MOTOR AT HOME)
-//!    - Extend position clamp when motor reaches home
-//!    - Secure position for wood advancement
-//!
-//! STEP 6.5: VERIFY CUT MOTOR HOME (CONTINUOUS CHECK)
+//! STEP 5: VERIFY CUT MOTOR HOME (CONTINUOUS CHECK)
 //!    - Verify cut motor at home position
 //!    - Check cut homing switch for confirmation
 //!    - Ensure motor position accuracy
 //!
-//! STEP 7: START FINAL ADVANCE (WHEN POSITION CLAMP EXTENDED AND CUT MOTOR VERIFIED)
+//! STEP 6: START FINAL ADVANCE (WHEN CUT MOTOR VERIFIED)
 //!    - Move position motor to final travel position
 //!    - Complete wood positioning sequence
 //!
-//! STEP 8: RUN MOTORS (CONTINUOUS)
+//! STEP 7: RUN MOTORS (CONTINUOUS)
 //!    - Execute motor movements continuously
 //!    - Maintain motion toward targets
 //!
-//! STEP 9: CHECK FOR COMPLETION AND TRANSITION TO CUTTING
+//! STEP 8: CHECK FOR COMPLETION AND TRANSITION TO CUTTING
 //!    - Monitor start cycle switch state
 //!    - If HIGH: transition to CUTTING for next cycle
 //!    - If LOW: transition to IDLE state
@@ -102,18 +94,6 @@ void swapClampPositionsForYeswood() {
     Serial.println("YESWOOD: Position clamp retracted for wood transfer");
     
     Serial.println("YESWOOD: Clamp positions swapped for wood advancement");
-}
-
-void returnPositionMotorToHomeForYeswood() {
-    moveMotorTo(POSITION_MOTOR, 0, POSITION_MOTOR_RETURN_SPEED);
-    Serial.println("YESWOOD: Position motor returning to home position");
-}
-
-void extendPositionClampWhenHomeForYeswood() {
-    if (positionMotor.distanceToGo() == 0 && positionMotor.currentPosition() == 0) {
-        extendPositionClamp();
-        Serial.println("YESWOOD: Position clamp extended - position motor at home");
-    }
 }
 
 //* ************************************************************************
@@ -179,8 +159,6 @@ void executeYeswoodSequence() {
     static bool secureClampRetracted = false;
     static bool positionMotorAdvanced = false;
     static bool clampsSwapped = false;
-    static bool positionMotorHomeStarted = false;
-    static bool positionClampExtended = false;
     static bool cutMotorHomeVerified = false;
     static bool finalAdvanceStarted = false;
     
@@ -219,46 +197,28 @@ void executeYeswoodSequence() {
     }
     
     //! ************************************************************************
-    //! STEP 5: START POSITION MOTOR RETURN WHEN CLAMPS SWAPPED
-    //! ************************************************************************
-    if (clampsSwapped && !positionMotorHomeStarted) {
-        returnPositionMotorToHomeForYeswood();
-        positionMotorHomeStarted = true;
-    }
-    
-    //! ************************************************************************
-    //! STEP 6: EXTEND POSITION CLAMP WHEN POSITION MOTOR AT HOME
-    //! ************************************************************************
-    if (positionMotorHomeStarted && !positionClampExtended) {
-        extendPositionClampWhenHomeForYeswood();
-        if (positionMotor.distanceToGo() == 0 && positionMotor.currentPosition() == 0) {
-            positionClampExtended = true;
-        }
-    }
-    
-    //! ************************************************************************
-    //! STEP 6.5: VERIFY CUT MOTOR HOME (CONTINUOUS CHECK)
+    //! STEP 5: VERIFY CUT MOTOR HOME (CONTINUOUS CHECK)
     //! ************************************************************************
     if (cutMotorReturnStarted && !cutMotorHomeVerified) {
         cutMotorHomeVerified = checkCutMotorHomeAndSensorForYeswood();
     }
     
     //! ************************************************************************
-    //! STEP 7: START FINAL ADVANCE WHEN POSITION CLAMP EXTENDED AND CUT MOTOR HOME VERIFIED
+    //! STEP 6: START FINAL ADVANCE WHEN CUT MOTOR VERIFIED
     //! ************************************************************************
-    if (positionClampExtended && cutMotorHomeVerified && !finalAdvanceStarted) {
+    if (cutMotorHomeVerified && !finalAdvanceStarted) {
         advancePositionMotorToTravelForYeswood();
         finalAdvanceStarted = true;
     }
     
     //! ************************************************************************
-    //! STEP 8: RUN MOTORS TO ENSURE THEY MOVE
+    //! STEP 7: RUN MOTORS TO ENSURE THEY MOVE
     //! ************************************************************************
     cutMotor.run();
     positionMotor.run();
     
     //! ************************************************************************
-    //! STEP 9: CHECK FOR COMPLETION AND TRANSITION TO CUTTING
+    //! STEP 8: CHECK FOR COMPLETION AND TRANSITION TO CUTTING
     //! ************************************************************************
     if (finalAdvanceStarted && positionMotor.distanceToGo() == 0) {
         // Check for manual reload intervention first
@@ -269,8 +229,6 @@ void executeYeswoodSequence() {
             positionMotorAdvanced = false;
             clampsSwapped = false;
             cutMotorHomeVerified = false;
-            positionMotorHomeStarted = false;
-            positionClampExtended = false;
             finalAdvanceStarted = false;
             return;
         }
@@ -284,21 +242,6 @@ void executeYeswoodSequence() {
         positionMotorAdvanced = false;
         clampsSwapped = false;
         cutMotorHomeVerified = false;
-        positionMotorHomeStarted = false;
-        positionClampExtended = false;
         finalAdvanceStarted = false;
     }
-}
-
-void reactivateSecureClampForYeswood() {
-    extendWoodSecureClamp();
-    Serial.println("YESWOOD: Secure wood clamp re-extended");
-    
-    retractPositionClamp();
-    Serial.println("YESWOOD: Position clamp retracted");
-}
-
-void setFinalClampStateForYeswood() {
-    extendPositionClamp();
-    Serial.println("YESWOOD: Position clamp extended - final operational state");
 } 

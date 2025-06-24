@@ -1,4 +1,5 @@
-#include "Config/OTA_Manager.h"
+#include <WiFi.h>
+#include <ArduinoOTA.h>
 #include "StateMachine/WebSocket_Manager.h" // For OTA status updates
 
 //* ************************************************************************
