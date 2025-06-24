@@ -222,10 +222,27 @@ void setup() {
 }
 
 void loop() {
+  //! Update all input switches for debouncing
+  cutHomingSwitch.update();
+  positionHomingSwitch.update();
+  reloadSwitch.update();
+  startCycleSwitch.update();
+  fixPositionButton.update();
+  woodSensor.update();
+  wasWoodSuctionedSensor.update();
+  
+  //! Run the main state machine - THIS IS CRITICAL FOR MOVEMENT
+  updateStateMachine();
+  
+  //! Handle motor movements - motors need to be continuously updated
+  cutMotor.run();
+  positionMotor.run();
+  
   if (WiFi.status() == WL_CONNECTED) {
     handleOTA();        // Handle Over-The-Air updates
     handleWebSocket();  // Handle WebSocket connections and messages
   }
-  // Add other loop tasks here if needed
-  delay(10); // Small delay to keep the system responsive
+  
+  // Small delay to keep the system responsive but allow fast motor updates
+  delay(1); // Reduced delay for better motor response
 } 
