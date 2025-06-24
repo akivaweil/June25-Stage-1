@@ -6,8 +6,13 @@
 #include "Config/Config.h"
 #include "Config/Pins_Definitions.h"
 #include "StateMachine/StateMachine.h"
-#include "OTA_Manager.h"
 #include "StateMachine/WebSocket_Manager.h"
+
+// OTA function declarations
+void initWiFi();
+void displayIP();
+void initOTA();
+void handleOTA();
 
 //* ************************************************************************
 //* ************************ AUTOMATED TABLE SAW **************************

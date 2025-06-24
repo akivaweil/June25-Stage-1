@@ -1,7 +1,9 @@
 #include "StateMachine/StateMachine.h"
 #include "Config/Config.h"
-#include "OTA_Manager.h"
 #include <Bounce2.h>
+
+// OTA function declaration
+void handleOTA();
 
 // External variable declarations
 extern Bounce startCycleSwitch;
